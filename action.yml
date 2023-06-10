@@ -14,7 +14,7 @@ runs:
   steps:
     - run: |
         GH_RELEASE=$(sed s#/refs/tags## <<< "https://api.github.com/repos/${{ github.repository }}/releases/${{ inputs.id }}")
-        upload_url=$(curl -s --request GET --url $GH_RELEASE | grep -oP '(?<="upload_url": ")[^"]*' | cut -d'{' -f1)
+        upload_url=$(curl -s --header "Authorization: Bearer ${{ github.token }}" --request GET --url $GH_RELEASE | grep -oP '(?<="upload_url": ")[^"]*' | cut -d'{' -f1)
         j=0
         if [ -d ${{ inputs.asset-path }} ]; then
             for filename in `ls ${{ inputs.asset-path }}`;
@@ -33,7 +33,7 @@ runs:
             curl --silent \
                 --request POST \
                 --url "$upload_url?name=$filename" \
-                --header "authorization: Bearer ${{ github.token }}" \
+                --header "Authorization: Bearer ${{ github.token }}" \
                 --header "content-type: $content_type" \
                 --data-binary @"${filepath}"
         done
