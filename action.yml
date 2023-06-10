@@ -1,8 +1,8 @@
 name: 'Upload GitHub release assets'
 description: 'Upload file to GitHub release assets'
 inputs:
-  tag:
-    description: 'git tag'
+  id:
+    description: 'release id'
     required: true
     default: ${{ github.ref }}
   asset-path:
@@ -13,7 +13,7 @@ runs:
   using: "composite"
   steps:
     - run: |
-        GH_RELEASE=$(sed s#/refs/tags## <<< "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ inputs.tag }}")
+        GH_RELEASE=$(sed s#/refs/tags## <<< "https://api.github.com/repos/${{ github.repository }}/releases/${{ inputs.id }}")
         upload_url=$(curl -s --request GET --url $GH_RELEASE | grep -oP '(?<="upload_url": ")[^"]*' | cut -d'{' -f1)
         j=0
         if [ -d ${{ inputs.asset-path }} ]; then
